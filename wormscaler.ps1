@@ -8,7 +8,7 @@ Add-Type -AssemblyName System.Drawing
 $regPath = "HKCU:\SOFTWARE\Team17SoftwareLTD\WormsArmageddon\Options"
 
 # Layout constants
-$PADDING = 103  # Left padding for centering
+$PADDING = 10  # Left padding
 $LABEL_WIDTH = 120
 $INPUT_WIDTH = 80
 $SPACING = 15
@@ -20,12 +20,22 @@ function Get-CurrentSettings {
         if (-not (Test-Path $regPath)) { return @{} }
 
         $props = Get-ItemProperty -Path $regPath
-        return @{
+        $settings = @{
             InternalWidth = if ($props.PSObject.Properties.Name -contains "DisplayXSize") { $props.DisplayXSize } else { "" }
             InternalHeight = if ($props.PSObject.Properties.Name -contains "DisplayYSize") { $props.DisplayYSize } else { "" }
             WindowWidth = if ($props.PSObject.Properties.Name -contains "WindowXSize") { $props.WindowXSize } else { "" }
             WindowHeight = if ($props.PSObject.Properties.Name -contains "WindowYSize") { $props.WindowYSize } else { "" }
         }
+
+        # Calculate current scale if both internal and window are set
+        if ($settings.InternalWidth -and $settings.WindowWidth -and $settings.InternalWidth -gt 0) {
+            $scale = [Math]::Round($settings.WindowWidth / $settings.InternalWidth, 1)
+            $settings.Scale = $scale
+        } else {
+            $settings.Scale = ""
+        }
+
+        return $settings
     }
     catch {
         return @{}
@@ -50,6 +60,16 @@ function New-TextBox {
     $textBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $textBox.Text = $text
     return $textBox
+}
+
+# Helper to create combobox
+function New-ComboBox {
+    param([int]$x, [int]$y, [int]$width)
+    $comboBox = New-Object System.Windows.Forms.ComboBox
+    $comboBox.Location = New-Object System.Drawing.Point($x, ($y - 2))
+    $comboBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
+    $comboBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+    return $comboBox
 }
 
 # Set registry values
@@ -102,7 +122,7 @@ $currentSettings = Get-CurrentSettings
 # Create form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Worms Armageddon Scaler"
-$form.Size = New-Object System.Drawing.Size(500, 250)
+$form.Size = New-Object System.Drawing.Size(500, 270)
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
@@ -110,7 +130,7 @@ $form.KeyPreview = $true
 $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $form.Close() } })
 
 # Description
-$form.Controls.Add((New-Label 10 10 470 "Internal resolution: configurable in-game. Window resolution: new in 3.8, upscales display."))
+$form.Controls.Add((New-Label 10 10 470 "Set internal resolution, then pick a scale multiplier."))
 
 # Calculate positions
 $labelX = $PADDING
@@ -127,25 +147,107 @@ $form.Controls.Add((New-Label $xLabelX $y1 $SPACING "x"))
 $internalHeightBox = New-TextBox $input2X $y1 $INPUT_WIDTH $currentSettings.InternalHeight
 $form.Controls.Add($internalHeightBox)
 
-# Window resolution row
+# Scale factor row
 $y2 = 90
-$form.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scaled (window):"))
-$windowWidthBox = New-TextBox $input1X $y2 $INPUT_WIDTH $currentSettings.WindowWidth
+$form.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
+$scaleCombo = New-ComboBox $input1X $y2 180
+$scaleCombo.Items.AddRange(@("1.25x", "1.5x", "1.75x", "2x", "Custom"))
+$form.Controls.Add($scaleCombo)
+
+# Preview label for calculated resolution
+$previewLabel = New-Object System.Windows.Forms.Label
+$previewLabel.Location = New-Object System.Drawing.Point(($input1X + 190), $y2)
+$previewLabel.Size = New-Object System.Drawing.Size(150, $INPUT_HEIGHT)
+$previewLabel.Text = ""
+$previewLabel.ForeColor = [System.Drawing.Color]::DarkGray
+$form.Controls.Add($previewLabel)
+
+# Custom resolution controls (initially hidden)
+$y3 = 115
+$customLabel = New-Label $labelX $y3 $LABEL_WIDTH "Custom window:"
+$customLabel.Visible = $false
+$form.Controls.Add($customLabel)
+$windowWidthBox = New-TextBox $input1X $y3 $INPUT_WIDTH $currentSettings.WindowWidth
+$windowWidthBox.Visible = $false
 $form.Controls.Add($windowWidthBox)
-$form.Controls.Add((New-Label $xLabelX $y2 $SPACING "x"))
-$windowHeightBox = New-TextBox $input2X $y2 $INPUT_WIDTH $currentSettings.WindowHeight
+$customXLabel = New-Label $xLabelX $y3 $SPACING "x"
+$customXLabel.Visible = $false
+$form.Controls.Add($customXLabel)
+$windowHeightBox = New-TextBox $input2X $y3 $INPUT_WIDTH $currentSettings.WindowHeight
+$windowHeightBox.Visible = $false
 $form.Controls.Add($windowHeightBox)
+
+# Function to update preview
+function Update-Preview {
+    $width = $internalWidthBox.Text
+    $height = $internalHeightBox.Text
+    $scale = $scaleCombo.SelectedItem
+
+    if ($width -match '^\d+$' -and $height -match '^\d+$' -and $scale -and $scale -ne "Custom") {
+        $multiplier = [decimal]($scale -replace 'x', '')
+        $windowW = [int]([decimal]$width * $multiplier)
+        $windowH = [int]([decimal]$height * $multiplier)
+        $previewLabel.Text = "= ${windowW}x$windowH"
+    } else {
+        $previewLabel.Text = ""
+    }
+}
+
+# Event handlers for real-time preview
+$internalWidthBox.Add_TextChanged({ Update-Preview })
+$internalHeightBox.Add_TextChanged({ Update-Preview })
+$scaleCombo.Add_SelectedIndexChanged({
+    $isCustom = $scaleCombo.SelectedItem -eq "Custom"
+    $customLabel.Visible = $isCustom
+    $windowWidthBox.Visible = $isCustom
+    $customXLabel.Visible = $isCustom
+    $windowHeightBox.Visible = $isCustom
+    Update-Preview
+})
+
+# Initialize current settings
+if ($currentSettings.Scale -ne "") {
+    $scaleText = "$($currentSettings.Scale)x"
+    $index = $scaleCombo.Items.IndexOf($scaleText)
+    if ($index -ge 0) {
+        $scaleCombo.SelectedIndex = $index
+    } else {
+        $scaleCombo.SelectedIndex = $scaleCombo.Items.IndexOf("Custom")
+        # Show custom controls if current scale doesn't match presets
+        $customLabel.Visible = $true
+        $windowWidthBox.Visible = $true
+        $customXLabel.Visible = $true
+        $windowHeightBox.Visible = $true
+    }
+}
+
+# Initial preview update
+Update-Preview
 
 # Buttons
 $applyButton = New-Object System.Windows.Forms.Button
-$applyButton.Location = New-Object System.Drawing.Point(95, 130)
+$applyButton.Location = New-Object System.Drawing.Point(95, 155)
 $applyButton.Size = New-Object System.Drawing.Size(150, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
 $applyButton.Add_Click({
     $settings = @{
-        InternalWidth = $internalWidthBox.Text; InternalHeight = $internalHeightBox.Text
-        WindowWidth = $windowWidthBox.Text; WindowHeight = $windowHeightBox.Text
+        InternalWidth = $internalWidthBox.Text
+        InternalHeight = $internalHeightBox.Text
+        WindowWidth = ""
+        WindowHeight = ""
+    }
+
+    # Calculate window resolution from scale if not custom
+    if ($scaleCombo.SelectedItem -and $scaleCombo.SelectedItem -ne "Custom") {
+        if ($internalWidthBox.Text -match '^\d+$' -and $internalHeightBox.Text -match '^\d+$') {
+            $multiplier = [decimal]($scaleCombo.SelectedItem -replace 'x', '')
+            $settings.WindowWidth = [int]([decimal]$internalWidthBox.Text * $multiplier)
+            $settings.WindowHeight = [int]([decimal]$internalHeightBox.Text * $multiplier)
+        }
+    } elseif ($scaleCombo.SelectedItem -eq "Custom") {
+        $settings.WindowWidth = $windowWidthBox.Text
+        $settings.WindowHeight = $windowHeightBox.Text
     }
 
     if (Set-WAResolution $settings) {
@@ -156,7 +258,7 @@ $applyButton.Add_Click({
 $form.Controls.Add($applyButton)
 
 $removeButton = New-Object System.Windows.Forms.Button
-$removeButton.Location = New-Object System.Drawing.Point(255, 130)
+$removeButton.Location = New-Object System.Drawing.Point(255, 155)
 $removeButton.Size = New-Object System.Drawing.Size(150, 35)
 $removeButton.Text = "Remove Scaling"
 $removeButton.Add_Click({
@@ -164,6 +266,8 @@ $removeButton.Add_Click({
         [System.Windows.Forms.MessageBox]::Show("All scaling settings removed!", "Success",
             [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
         $internalWidthBox.Text = $internalHeightBox.Text = $windowWidthBox.Text = $windowHeightBox.Text = ""
+        $scaleCombo.SelectedIndex = -1
+        $previewLabel.Text = ""
     }
 })
 $form.Controls.Add($removeButton)
