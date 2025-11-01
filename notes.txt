@@ -1,0 +1,30 @@
+worms 3.8 added a hidden resolution scaling setting to the registry.
+
+note: the initial worms frontend fixes scaling via wkSuperFrontend.
+
+note: this does not work with OpeNGL, Direct3D 9 recommended, DirectDraw works
+      though mouse can goof when moving camera while doing actions.
+
+
+HKEY_CURRENT_USER\SOFTWARE\Team17SoftwareLTD\WormsArmageddon\Options
+
+Display size is the resolution the game will run at:
+  
+  note: this is also configurable in Options > Graphics
+
+  - DisplayXSize
+  - DisplayYSize 
+
+Window size is the resolution the game will upscale to:
+
+  - WindowXSize
+  - WindowYSize
+  - to play in borderless-windows, set these to your monitor resolution
+
+
+
+I suppose for the UI I want to remove our extra title at the top, it's already in the title bar
+
+I want to remove the blue "Current internal" scale stuff.
+
+2048x1536
