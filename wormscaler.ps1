@@ -9,10 +9,10 @@ $regPath = "HKCU:\SOFTWARE\Team17SoftwareLTD\WormsArmageddon\Options"
 
 # Layout constants
 $PADDING = 10  # Left padding
-$LABEL_WIDTH = 120
+$LABEL_WIDTH = 110
 $INPUT_WIDTH = 80
 $SPACING = 15
-$INPUT_HEIGHT = 20
+$INPUT_HEIGHT = 22
 
 # Get current settings
 function Get-CurrentSettings {
@@ -51,6 +51,7 @@ function New-Label {
     $label.Text = $text
     $label.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     $label.BackColor = [System.Drawing.Color]::Transparent
+    $label.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
     return $label
 }
 
@@ -64,6 +65,7 @@ function New-TextBox {
     $textBox.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
     $textBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     $textBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
+    $textBox.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
     return $textBox
 }
 
@@ -77,6 +79,7 @@ function New-ComboBox {
     $comboBox.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
     $comboBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     $comboBox.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $comboBox.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
     return $comboBox
 }
 
@@ -259,8 +262,8 @@ $form.Controls.Add($titleBar)
 
 # Content panel with padding
 $contentPanel = New-Object System.Windows.Forms.Panel
-$contentPanel.Location = New-Object System.Drawing.Point(50, 40)
-$contentPanel.Size = New-Object System.Drawing.Size(400, 220)
+$contentPanel.Location = New-Object System.Drawing.Point(20, 50)
+$contentPanel.Size = New-Object System.Drawing.Size(460, 210)
 $contentPanel.BackColor = [System.Drawing.Color]::FromArgb(200, 30, 30, 30)  # Semi-transparent dark grey
 $form.Controls.Add($contentPanel)
 
@@ -269,7 +272,7 @@ $contentPanel.Controls.Add((New-Label 10 10 380 "Set internal resolution, then p
 
 # Calculate positions
 $labelX = $PADDING
-$input1X = $labelX + $LABEL_WIDTH + 5
+$input1X = $labelX + $LABEL_WIDTH + 2
 $xLabelX = $input1X + $INPUT_WIDTH + 5
 $input2X = $xLabelX + $SPACING + 5
 
@@ -295,6 +298,8 @@ $previewLabel.Location = New-Object System.Drawing.Point(($input1X + 190), $y2)
 $previewLabel.Size = New-Object System.Drawing.Size(150, $INPUT_HEIGHT)
 $previewLabel.Text = ""
 $previewLabel.ForeColor = [System.Drawing.Color]::FromArgb(150, 150, 150)
+$previewLabel.BackColor = [System.Drawing.Color]::Transparent
+$previewLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
 $contentPanel.Controls.Add($previewLabel)
 
 # Custom resolution controls (initially hidden)
@@ -369,10 +374,10 @@ $applyButton.BackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)
 $applyButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $applyButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $applyButton.FlatAppearance.BorderSize = 0
-$applyButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+$applyButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight
 if (Test-Path "reset.png") {
     $applyButton.Image = [System.Drawing.Image]::FromFile("reset.png")
-    $applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
     $applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 }
 $applyButton.Add_Click({
@@ -410,10 +415,10 @@ $removeButton.BackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)
 $removeButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $removeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $removeButton.FlatAppearance.BorderSize = 0
-$removeButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+$removeButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight
 if (Test-Path "reset.png") {
     $removeButton.Image = [System.Drawing.Image]::FromFile("reset.png")
-    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
     $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 }
 $removeButton.Add_Click({
