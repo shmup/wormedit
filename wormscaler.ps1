@@ -195,8 +195,9 @@ $closeButton.ForeColor = [System.Drawing.Color]::FromArgb(232, 17, 35)  # Red X
 $closeButton.BackColor = [System.Drawing.Color]::Transparent
 $closeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $closeButton.FlatAppearance.BorderSize = 0
-$closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::Transparent
-$closeButton.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::Transparent
+$closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)  # Slightly lighter on hover
+$closeButton.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(50, 50, 50)  # Even lighter on click
+$closeButton.TabStop = $false  # Prevents focus rectangle
 if (Test-Path "close.png") {
     $originalImage = [System.Drawing.Image]::FromFile("close.png")
     # Resize image to fit button (16x16 for some padding)
