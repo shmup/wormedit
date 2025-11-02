@@ -50,6 +50,7 @@ function New-Label {
     $label.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $label.Text = $text
     $label.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
+    $label.BackColor = [System.Drawing.Color]::Transparent
     return $label
 }
 
@@ -256,8 +257,15 @@ $titleLabel.Add_MouseUp({
 
 $form.Controls.Add($titleBar)
 
+# Content panel with padding
+$contentPanel = New-Object System.Windows.Forms.Panel
+$contentPanel.Location = New-Object System.Drawing.Point(50, 40)
+$contentPanel.Size = New-Object System.Drawing.Size(400, 220)
+$contentPanel.BackColor = [System.Drawing.Color]::FromArgb(200, 30, 30, 30)  # Semi-transparent dark grey
+$form.Controls.Add($contentPanel)
+
 # Description
-$form.Controls.Add((New-Label 10 40 470 "Set internal resolution, then pick a scale multiplier."))
+$contentPanel.Controls.Add((New-Label 10 10 380 "Set internal resolution, then pick a scale multiplier."))
 
 # Calculate positions
 $labelX = $PADDING
@@ -266,20 +274,20 @@ $xLabelX = $input1X + $INPUT_WIDTH + 5
 $input2X = $xLabelX + $SPACING + 5
 
 # Internal resolution row
-$y1 = 85
-$form.Controls.Add((New-Label $labelX $y1 $LABEL_WIDTH "Internal (game):"))
+$y1 = 45
+$contentPanel.Controls.Add((New-Label $labelX $y1 $LABEL_WIDTH "Internal (game):"))
 $internalWidthBox = New-TextBox $input1X $y1 $INPUT_WIDTH $currentSettings.InternalWidth
-$form.Controls.Add($internalWidthBox)
-$form.Controls.Add((New-Label $xLabelX $y1 $SPACING "x"))
+$contentPanel.Controls.Add($internalWidthBox)
+$contentPanel.Controls.Add((New-Label $xLabelX $y1 $SPACING "x"))
 $internalHeightBox = New-TextBox $input2X $y1 $INPUT_WIDTH $currentSettings.InternalHeight
-$form.Controls.Add($internalHeightBox)
+$contentPanel.Controls.Add($internalHeightBox)
 
 # Scale factor row
-$y2 = 120
-$form.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
+$y2 = 80
+$contentPanel.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
 $scaleCombo = New-ComboBox $input1X $y2 180
 $scaleCombo.Items.AddRange(@("1.25x", "1.5x", "1.75x", "2x", "Custom"))
-$form.Controls.Add($scaleCombo)
+$contentPanel.Controls.Add($scaleCombo)
 
 # Preview label for calculated resolution
 $previewLabel = New-Object System.Windows.Forms.Label
@@ -287,22 +295,22 @@ $previewLabel.Location = New-Object System.Drawing.Point(($input1X + 190), $y2)
 $previewLabel.Size = New-Object System.Drawing.Size(150, $INPUT_HEIGHT)
 $previewLabel.Text = ""
 $previewLabel.ForeColor = [System.Drawing.Color]::FromArgb(150, 150, 150)
-$form.Controls.Add($previewLabel)
+$contentPanel.Controls.Add($previewLabel)
 
 # Custom resolution controls (initially hidden)
-$y3 = 145
+$y3 = 115
 $customLabel = New-Label $labelX $y3 $LABEL_WIDTH "Custom window:"
 $customLabel.Visible = $false
-$form.Controls.Add($customLabel)
+$contentPanel.Controls.Add($customLabel)
 $windowWidthBox = New-TextBox $input1X $y3 $INPUT_WIDTH $currentSettings.WindowWidth
 $windowWidthBox.Visible = $false
-$form.Controls.Add($windowWidthBox)
+$contentPanel.Controls.Add($windowWidthBox)
 $customXLabel = New-Label $xLabelX $y3 $SPACING "x"
 $customXLabel.Visible = $false
-$form.Controls.Add($customXLabel)
+$contentPanel.Controls.Add($customXLabel)
 $windowHeightBox = New-TextBox $input2X $y3 $INPUT_WIDTH $currentSettings.WindowHeight
 $windowHeightBox.Visible = $false
-$form.Controls.Add($windowHeightBox)
+$contentPanel.Controls.Add($windowHeightBox)
 
 # Function to update preview
 function Update-Preview {
@@ -353,7 +361,7 @@ Update-Preview
 
 # Buttons
 $applyButton = New-Object System.Windows.Forms.Button
-$applyButton.Location = New-Object System.Drawing.Point(130, 185)
+$applyButton.Location = New-Object System.Drawing.Point(70, 160)
 $applyButton.Size = New-Object System.Drawing.Size(120, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9)
@@ -392,10 +400,10 @@ $applyButton.Add_Click({
             [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
     }
 })
-$form.Controls.Add($applyButton)
+$contentPanel.Controls.Add($applyButton)
 
 $removeButton = New-Object System.Windows.Forms.Button
-$removeButton.Location = New-Object System.Drawing.Point(260, 185)
+$removeButton.Location = New-Object System.Drawing.Point(210, 160)
 $removeButton.Size = New-Object System.Drawing.Size(130, 35)
 $removeButton.Text = "Remove Scaling"
 $removeButton.BackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)
@@ -417,7 +425,7 @@ $removeButton.Add_Click({
         $previewLabel.Text = ""
     }
 })
-$form.Controls.Add($removeButton)
+$contentPanel.Controls.Add($removeButton)
 
 # Show form
 [void]$form.ShowDialog()
