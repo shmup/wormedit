@@ -49,6 +49,7 @@ function New-Label {
     $label.Location = New-Object System.Drawing.Point($x, $y)
     $label.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $label.Text = $text
+    $label.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     return $label
 }
 
@@ -59,6 +60,9 @@ function New-TextBox {
     $textBox.Location = New-Object System.Drawing.Point($x, ($y - 2))
     $textBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $textBox.Text = $text
+    $textBox.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
+    $textBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
+    $textBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
     return $textBox
 }
 
@@ -69,6 +73,9 @@ function New-ComboBox {
     $comboBox.Location = New-Object System.Drawing.Point($x, ($y - 2))
     $comboBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $comboBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+    $comboBox.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
+    $comboBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
+    $comboBox.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
     return $comboBox
 }
 
@@ -118,7 +125,7 @@ function Remove-WAScaling {
 
 # Load icon from file if it exists
 function Get-FormIcon {
-    param([string]$path = "wormscaler.ico")
+    param([string]$path = "icon.ico")
     if (Test-Path $path) {
         return New-Object System.Drawing.Icon($path)
     }
@@ -150,6 +157,8 @@ $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 $form.KeyPreview = $true
+$form.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
+$form.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $form.Close() } })
 
 # Set form icon if available
@@ -186,7 +195,7 @@ $previewLabel = New-Object System.Windows.Forms.Label
 $previewLabel.Location = New-Object System.Drawing.Point(($input1X + 190), $y2)
 $previewLabel.Size = New-Object System.Drawing.Size(150, $INPUT_HEIGHT)
 $previewLabel.Text = ""
-$previewLabel.ForeColor = [System.Drawing.Color]::DarkGray
+$previewLabel.ForeColor = [System.Drawing.Color]::FromArgb(150, 150, 150)
 $form.Controls.Add($previewLabel)
 
 # Custom resolution controls (initially hidden)
@@ -257,9 +266,10 @@ $applyButton.Location = New-Object System.Drawing.Point(95, 155)
 $applyButton.Size = New-Object System.Drawing.Size(150, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$applyButton.Image = New-ButtonIcon '✓' ([System.Drawing.Color]::Green)
-$applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
-$applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
+$applyButton.BackColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
+$applyButton.ForeColor = [System.Drawing.Color]::White
+$applyButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+$applyButton.FlatAppearance.BorderSize = 0
 $applyButton.Add_Click({
     $settings = @{
         InternalWidth = $internalWidthBox.Text
@@ -291,9 +301,15 @@ $removeButton = New-Object System.Windows.Forms.Button
 $removeButton.Location = New-Object System.Drawing.Point(255, 155)
 $removeButton.Size = New-Object System.Drawing.Size(150, 35)
 $removeButton.Text = "Remove Scaling"
-$removeButton.Image = New-ButtonIcon '×' ([System.Drawing.Color]::Crimson)
-$removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
-$removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
+$removeButton.BackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
+$removeButton.ForeColor = [System.Drawing.Color]::White
+$removeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+$removeButton.FlatAppearance.BorderSize = 0
+if (Test-Path "reset.png") {
+    $removeButton.Image = [System.Drawing.Image]::FromFile("reset.png")
+    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
+}
 $removeButton.Add_Click({
     if (Remove-WAScaling) {
         [System.Windows.Forms.MessageBox]::Show("Window scaling removed!", "Success",
