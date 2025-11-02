@@ -108,7 +108,7 @@ function Set-WAResolution {
 # Remove all scaling settings
 function Remove-WAScaling {
     try {
-        "DisplayXSize", "DisplayYSize", "WindowXSize", "WindowYSize" | ForEach-Object {
+        "WindowXSize", "WindowYSize" | ForEach-Object {
             Remove-ItemProperty -Path $regPath -Name $_ -ErrorAction SilentlyContinue
         }
         return $true
@@ -296,9 +296,9 @@ $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
 $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 $removeButton.Add_Click({
     if (Remove-WAScaling) {
-        [System.Windows.Forms.MessageBox]::Show("All scaling settings removed!", "Success",
+        [System.Windows.Forms.MessageBox]::Show("Window scaling removed!", "Success",
             [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-        $internalWidthBox.Text = $internalHeightBox.Text = $windowWidthBox.Text = $windowHeightBox.Text = ""
+        $windowWidthBox.Text = $windowHeightBox.Text = ""
         $scaleCombo.SelectedIndex = -1
         $previewLabel.Text = ""
     }
