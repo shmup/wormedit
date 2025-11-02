@@ -188,14 +188,27 @@ $titleBar.Controls.Add($titleLabel)
 # Close button
 $closeButton = New-Object System.Windows.Forms.Button
 $closeButton.Location = New-Object System.Drawing.Point(465, 5)
-$closeButton.Size = New-Object System.Drawing.Size(25, 20)
+$closeButton.Size = New-Object System.Drawing.Size(20, 20)
 $closeButton.Text = "×"
 $closeButton.Font = New-Object System.Drawing.Font("Arial", 12, [System.Drawing.FontStyle]::Bold)
-$closeButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
-$closeButton.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
+$closeButton.ForeColor = [System.Drawing.Color]::FromArgb(232, 17, 35)  # Red X
+$closeButton.BackColor = [System.Drawing.Color]::Transparent
 $closeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $closeButton.FlatAppearance.BorderSize = 0
-$closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(232, 17, 35)  # Red on hover
+$closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::Transparent
+$closeButton.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::Transparent
+if (Test-Path "close.png") {
+    $originalImage = [System.Drawing.Image]::FromFile("close.png")
+    # Resize image to fit button (16x16 for some padding)
+    $resizedImage = New-Object System.Drawing.Bitmap(16, 16)
+    $graphics = [System.Drawing.Graphics]::FromImage($resizedImage)
+    $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+    $graphics.DrawImage($originalImage, 0, 0, 16, 16)
+    $graphics.Dispose()
+    $closeButton.Image = $resizedImage
+    $closeButton.Text = ""
+    $closeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+}
 $closeButton.Add_Click({ $form.Close() })
 $titleBar.Controls.Add($closeButton)
 
