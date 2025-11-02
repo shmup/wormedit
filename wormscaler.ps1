@@ -165,8 +165,8 @@ $icon = Get-FormIcon
 if ($icon) { $form.Icon = $icon }
 
 # Set background image if available
-if (Test-Path "bubbles.png") {
-    $form.BackgroundImage = [System.Drawing.Image]::FromFile("bubbles.png")
+if (Test-Path "fly.png") {
+    $form.BackgroundImage = [System.Drawing.Image]::FromFile("fly.png")
     $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Tile
 }
 
