@@ -152,10 +152,9 @@ $currentSettings = Get-CurrentSettings
 # Create form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Worms Armageddon Scaler"
-$form.Size = New-Object System.Drawing.Size(500, 270)
+$form.Size = New-Object System.Drawing.Size(500, 300)  # Increased height for custom title bar
 $form.StartPosition = "CenterScreen"
-$form.FormBorderStyle = "FixedDialog"
-$form.MaximizeBox = $false
+$form.FormBorderStyle = "None"  # Remove Windows title bar
 $form.KeyPreview = $true
 $form.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 $form.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
@@ -165,8 +164,80 @@ $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $f
 $icon = Get-FormIcon
 if ($icon) { $form.Icon = $icon }
 
+# Custom title bar
+$titleBar = New-Object System.Windows.Forms.Panel
+$titleBar.Location = New-Object System.Drawing.Point(0, 0)
+$titleBar.Size = New-Object System.Drawing.Size(500, 30)
+$titleBar.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)  # Pure black
+
+# Title label
+$titleLabel = New-Object System.Windows.Forms.Label
+$titleLabel.Location = New-Object System.Drawing.Point(10, 7)
+$titleLabel.Size = New-Object System.Drawing.Size(300, 16)
+$titleLabel.Text = "Worms Armageddon Scaler"
+$titleLabel.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
+$titleLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$titleBar.Controls.Add($titleLabel)
+
+# Close button
+$closeButton = New-Object System.Windows.Forms.Button
+$closeButton.Location = New-Object System.Drawing.Point(465, 5)
+$closeButton.Size = New-Object System.Drawing.Size(25, 20)
+$closeButton.Text = "×"
+$closeButton.Font = New-Object System.Drawing.Font("Arial", 12, [System.Drawing.FontStyle]::Bold)
+$closeButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
+$closeButton.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)
+$closeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+$closeButton.FlatAppearance.BorderSize = 0
+$closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(232, 17, 35)  # Red on hover
+$closeButton.Add_Click({ $form.Close() })
+$titleBar.Controls.Add($closeButton)
+
+# Make title bar draggable
+$script:dragging = $false
+$script:dragOffset = New-Object System.Drawing.Point(0, 0)
+
+$titleBar.Add_MouseDown({
+    $script:dragging = $true
+    $script:dragOffset = New-Object System.Drawing.Point($_.X, $_.Y)
+})
+
+$titleBar.Add_MouseMove({
+    if ($script:dragging) {
+        $form.Location = New-Object System.Drawing.Point(
+            ($form.Location.X + $_.X - $script:dragOffset.X),
+            ($form.Location.Y + $_.Y - $script:dragOffset.Y)
+        )
+    }
+})
+
+$titleBar.Add_MouseUp({
+    $script:dragging = $false
+})
+
+# Also allow dragging from title label
+$titleLabel.Add_MouseDown({
+    $script:dragging = $true
+    $script:dragOffset = New-Object System.Drawing.Point($_.X, $_.Y)
+})
+
+$titleLabel.Add_MouseMove({
+    if ($script:dragging) {
+        $form.Location = New-Object System.Drawing.Point(
+            ($form.Location.X + $_.X - $script:dragOffset.X),
+            ($form.Location.Y + $_.Y - $script:dragOffset.Y)
+        )
+    }
+})
+
+$titleLabel.Add_MouseUp({
+    $script:dragging = $false
+})
+
+$form.Controls.Add($titleBar)
+
 # Description
-$form.Controls.Add((New-Label 10 10 470 "Set internal resolution, then pick a scale multiplier."))
+$form.Controls.Add((New-Label 10 40 470 "Set internal resolution, then pick a scale multiplier."))
 
 # Calculate positions
 $labelX = $PADDING
@@ -175,7 +246,7 @@ $xLabelX = $input1X + $INPUT_WIDTH + 5
 $input2X = $xLabelX + $SPACING + 5
 
 # Internal resolution row
-$y1 = 55
+$y1 = 85
 $form.Controls.Add((New-Label $labelX $y1 $LABEL_WIDTH "Internal (game):"))
 $internalWidthBox = New-TextBox $input1X $y1 $INPUT_WIDTH $currentSettings.InternalWidth
 $form.Controls.Add($internalWidthBox)
@@ -184,7 +255,7 @@ $internalHeightBox = New-TextBox $input2X $y1 $INPUT_WIDTH $currentSettings.Inte
 $form.Controls.Add($internalHeightBox)
 
 # Scale factor row
-$y2 = 90
+$y2 = 120
 $form.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
 $scaleCombo = New-ComboBox $input1X $y2 180
 $scaleCombo.Items.AddRange(@("1.25x", "1.5x", "1.75x", "2x", "Custom"))
@@ -199,7 +270,7 @@ $previewLabel.ForeColor = [System.Drawing.Color]::FromArgb(150, 150, 150)
 $form.Controls.Add($previewLabel)
 
 # Custom resolution controls (initially hidden)
-$y3 = 115
+$y3 = 145
 $customLabel = New-Label $labelX $y3 $LABEL_WIDTH "Custom window:"
 $customLabel.Visible = $false
 $form.Controls.Add($customLabel)
@@ -262,7 +333,7 @@ Update-Preview
 
 # Buttons
 $applyButton = New-Object System.Windows.Forms.Button
-$applyButton.Location = New-Object System.Drawing.Point(95, 155)
+$applyButton.Location = New-Object System.Drawing.Point(95, 185)
 $applyButton.Size = New-Object System.Drawing.Size(150, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
@@ -298,7 +369,7 @@ $applyButton.Add_Click({
 $form.Controls.Add($applyButton)
 
 $removeButton = New-Object System.Windows.Forms.Button
-$removeButton.Location = New-Object System.Drawing.Point(255, 155)
+$removeButton.Location = New-Object System.Drawing.Point(255, 185)
 $removeButton.Size = New-Object System.Drawing.Size(150, 35)
 $removeButton.Text = "Remove Scaling"
 $removeButton.BackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
