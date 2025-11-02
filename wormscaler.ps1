@@ -60,7 +60,7 @@ function New-TextBox {
     $textBox.Location = New-Object System.Drawing.Point($x, ($y - 2))
     $textBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $textBox.Text = $text
-    $textBox.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
+    $textBox.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
     $textBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     $textBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
     return $textBox
@@ -73,7 +73,7 @@ function New-ComboBox {
     $comboBox.Location = New-Object System.Drawing.Point($x, ($y - 2))
     $comboBox.Size = New-Object System.Drawing.Size($width, $INPUT_HEIGHT)
     $comboBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-    $comboBox.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
+    $comboBox.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
     $comboBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
     $comboBox.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
     return $comboBox
@@ -156,7 +156,7 @@ $form.Size = New-Object System.Drawing.Size(500, 300)  # Increased height for cu
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "None"  # Remove Windows title bar
 $form.KeyPreview = $true
-$form.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
+$form.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)  # Pure black
 $form.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $form.Close() } })
 
@@ -168,7 +168,7 @@ if ($icon) { $form.Icon = $icon }
 $titleBar = New-Object System.Windows.Forms.Panel
 $titleBar.Location = New-Object System.Drawing.Point(0, 0)
 $titleBar.Size = New-Object System.Drawing.Size(500, 30)
-$titleBar.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)  # Pure black
+$titleBar.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)  # Slightly lighter black
 
 # Title label
 $titleLabel = New-Object System.Windows.Forms.Label
@@ -186,7 +186,7 @@ $closeButton.Size = New-Object System.Drawing.Size(25, 20)
 $closeButton.Text = "×"
 $closeButton.Font = New-Object System.Drawing.Font("Arial", 12, [System.Drawing.FontStyle]::Bold)
 $closeButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
-$closeButton.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)
+$closeButton.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 20)
 $closeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $closeButton.FlatAppearance.BorderSize = 0
 $closeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(232, 17, 35)  # Red on hover
@@ -333,14 +333,20 @@ Update-Preview
 
 # Buttons
 $applyButton = New-Object System.Windows.Forms.Button
-$applyButton.Location = New-Object System.Drawing.Point(95, 185)
-$applyButton.Size = New-Object System.Drawing.Size(150, 35)
+$applyButton.Location = New-Object System.Drawing.Point(130, 185)
+$applyButton.Size = New-Object System.Drawing.Size(120, 35)
 $applyButton.Text = "Apply Settings"
-$applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$applyButton.BackColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
-$applyButton.ForeColor = [System.Drawing.Color]::White
+$applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$applyButton.BackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)
+$applyButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $applyButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $applyButton.FlatAppearance.BorderSize = 0
+$applyButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+if (Test-Path "reset.png") {
+    $applyButton.Image = [System.Drawing.Image]::FromFile("reset.png")
+    $applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
+}
 $applyButton.Add_Click({
     $settings = @{
         InternalWidth = $internalWidthBox.Text
@@ -369,16 +375,17 @@ $applyButton.Add_Click({
 $form.Controls.Add($applyButton)
 
 $removeButton = New-Object System.Windows.Forms.Button
-$removeButton.Location = New-Object System.Drawing.Point(255, 185)
-$removeButton.Size = New-Object System.Drawing.Size(150, 35)
+$removeButton.Location = New-Object System.Drawing.Point(260, 185)
+$removeButton.Size = New-Object System.Drawing.Size(130, 35)
 $removeButton.Text = "Remove Scaling"
-$removeButton.BackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
-$removeButton.ForeColor = [System.Drawing.Color]::White
+$removeButton.BackColor = [System.Drawing.Color]::FromArgb(40, 40, 40)
+$removeButton.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $removeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $removeButton.FlatAppearance.BorderSize = 0
+$removeButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
 if (Test-Path "reset.png") {
     $removeButton.Image = [System.Drawing.Image]::FromFile("reset.png")
-    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
     $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 }
 $removeButton.Add_Click({
