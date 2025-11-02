@@ -29,7 +29,7 @@ function Get-CurrentSettings {
 
         # Calculate current scale if both internal and window are set
         if ($settings.InternalWidth -and $settings.WindowWidth -and $settings.InternalWidth -gt 0) {
-            $scale = [Math]::Round($settings.WindowWidth / $settings.InternalWidth, 1)
+            $scale = [Math]::Round($settings.WindowWidth / $settings.InternalWidth, 2)
             $settings.Scale = $scale
         } else {
             $settings.Scale = ""
@@ -162,7 +162,6 @@ $form.FormBorderStyle = "None"  # Remove Windows title bar
 $form.KeyPreview = $true
 $form.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)  # Pure black
 $form.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
-$form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $form.Close() } })
 
 # Set form icon if available
 $icon = Get-FormIcon
@@ -291,6 +290,15 @@ $contentPanel.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
 $scaleCombo = New-ComboBox $input1X $y2 180
 $scaleCombo.Items.AddRange(@("1.25x", "1.5x", "1.75x", "2x", "Custom"))
 $contentPanel.Controls.Add($scaleCombo)
+
+# Add Escape key handler - only close form if dropdown is not open
+$form.Add_KeyDown({
+    if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) {
+        if (-not $scaleCombo.DroppedDown) {
+            $form.Close()
+        }
+    }
+})
 
 # Preview label for calculated resolution
 $previewLabel = New-Object System.Windows.Forms.Label
