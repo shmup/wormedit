@@ -164,6 +164,12 @@ $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $f
 $icon = Get-FormIcon
 if ($icon) { $form.Icon = $icon }
 
+# Set background image if available
+if (Test-Path "bubbles.png") {
+    $form.BackgroundImage = [System.Drawing.Image]::FromFile("bubbles.png")
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Tile
+}
+
 # Custom title bar
 $titleBar = New-Object System.Windows.Forms.Panel
 $titleBar.Location = New-Object System.Drawing.Point(0, 0)
