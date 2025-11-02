@@ -257,7 +257,7 @@ $applyButton.Location = New-Object System.Drawing.Point(95, 155)
 $applyButton.Size = New-Object System.Drawing.Size(150, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$applyButton.Image = New-ButtonIcon "✓" ([System.Drawing.Color]::Green)
+$applyButton.Image = New-ButtonIcon '✓' ([System.Drawing.Color]::Green)
 $applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
 $applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 $applyButton.Add_Click({
@@ -291,7 +291,7 @@ $removeButton = New-Object System.Windows.Forms.Button
 $removeButton.Location = New-Object System.Drawing.Point(255, 155)
 $removeButton.Size = New-Object System.Drawing.Size(150, 35)
 $removeButton.Text = "Remove Scaling"
-$removeButton.Image = New-ButtonIcon "×" ([System.Drawing.Color]::Crimson)
+$removeButton.Image = New-ButtonIcon '×' ([System.Drawing.Color]::Crimson)
 $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
 $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 $removeButton.Add_Click({
