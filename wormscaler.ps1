@@ -156,7 +156,7 @@ $currentSettings = Get-CurrentSettings
 # Create form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Worms Armageddon Scaler"
-$form.Size = New-Object System.Drawing.Size(500, 300)  # Increased height for custom title bar
+$form.Size = New-Object System.Drawing.Size(500, 280)  # Balanced padding top and bottom
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "None"  # Remove Windows title bar
 $form.KeyPreview = $true
@@ -263,7 +263,7 @@ $form.Controls.Add($titleBar)
 $contentPanel = New-Object System.Windows.Forms.Panel
 $contentPanel.Location = New-Object System.Drawing.Point(20, 50)
 $contentPanel.Size = New-Object System.Drawing.Size(460, 210)
-$contentPanel.BackColor = [System.Drawing.Color]::FromArgb(200, 30, 30, 30)  # Semi-transparent dark grey
+$contentPanel.BackColor = [System.Drawing.Color]::FromArgb(210, 10, 10, 10)  # Semi-transparent dark grey
 $form.Controls.Add($contentPanel)
 
 # Description
@@ -288,7 +288,7 @@ $contentPanel.Controls.Add($internalHeightBox)
 $y2 = 80
 $contentPanel.Controls.Add((New-Label $labelX $y2 $LABEL_WIDTH "Scale factor:"))
 $scaleCombo = New-ComboBox $input1X $y2 180
-$scaleCombo.Items.AddRange(@("1.25x", "1.5x", "1.75x", "2x", "Custom"))
+$scaleCombo.Items.AddRange(@("1x", "1.25x", "1.5x", "1.75x", "2x", "Custom"))
 $contentPanel.Controls.Add($scaleCombo)
 
 # Add Escape key handler - only close form if dropdown is not open
