@@ -116,6 +116,29 @@ function Remove-WAScaling {
     catch { return $false }
 }
 
+# Load icon from file if it exists
+function Get-FormIcon {
+    param([string]$path = "wormscaler.ico")
+    if (Test-Path $path) {
+        return New-Object System.Drawing.Icon($path)
+    }
+    return $null
+}
+
+# Create button icon from text (simple colored circle)
+function New-ButtonIcon {
+    param([string]$symbol, [System.Drawing.Color]$color)
+    $bmp = New-Object System.Drawing.Bitmap(16, 16)
+    $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+    $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $graphics.Clear([System.Drawing.Color]::Transparent)
+    $brush = New-Object System.Drawing.SolidBrush($color)
+    $graphics.FillEllipse($brush, 2, 2, 12, 12)
+    $brush.Dispose()
+    $graphics.Dispose()
+    return $bmp
+}
+
 # Get current settings
 $currentSettings = Get-CurrentSettings
 
@@ -128,6 +151,10 @@ $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 $form.KeyPreview = $true
 $form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::Escape) { $form.Close() } })
+
+# Set form icon if available
+$icon = Get-FormIcon
+if ($icon) { $form.Icon = $icon }
 
 # Description
 $form.Controls.Add((New-Label 10 10 470 "Set internal resolution, then pick a scale multiplier."))
@@ -230,6 +257,9 @@ $applyButton.Location = New-Object System.Drawing.Point(95, 155)
 $applyButton.Size = New-Object System.Drawing.Size(150, 35)
 $applyButton.Text = "Apply Settings"
 $applyButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+$applyButton.Image = New-ButtonIcon "✓" ([System.Drawing.Color]::Green)
+$applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+$applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 $applyButton.Add_Click({
     $settings = @{
         InternalWidth = $internalWidthBox.Text
@@ -261,6 +291,9 @@ $removeButton = New-Object System.Windows.Forms.Button
 $removeButton.Location = New-Object System.Drawing.Point(255, 155)
 $removeButton.Size = New-Object System.Drawing.Size(150, 35)
 $removeButton.Text = "Remove Scaling"
+$removeButton.Image = New-ButtonIcon "×" ([System.Drawing.Color]::Crimson)
+$removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+$removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
 $removeButton.Add_Click({
     if (Remove-WAScaling) {
         [System.Windows.Forms.MessageBox]::Show("All scaling settings removed!", "Success",
