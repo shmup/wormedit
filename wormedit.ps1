@@ -386,12 +386,6 @@ $applyButton.FlatAppearance.BorderSize = 1
 $applyButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
 $applyButton.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 $applyButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-if (Test-Path "reset.png") {
-    $applyButton.Image = [System.Drawing.Image]::FromFile("reset.png")
-    $applyButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
-    $applyButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
-    $applyButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight
-}
 $applyButton.Add_Click({
     $settings = @{
         InternalWidth = $internalWidthBox.Text
@@ -431,12 +425,6 @@ $removeButton.FlatAppearance.BorderSize = 1
 $removeButton.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
 $removeButton.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 $removeButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-if (Test-Path "reset.png") {
-    $removeButton.Image = [System.Drawing.Image]::FromFile("reset.png")
-    $removeButton.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft
-    $removeButton.TextImageRelation = [System.Windows.Forms.TextImageRelation]::ImageBeforeText
-    $removeButton.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight
-}
 $removeButton.Add_Click({
     if (Remove-WAScaling) {
         [System.Windows.Forms.MessageBox]::Show("Window scaling removed!", "Success",
